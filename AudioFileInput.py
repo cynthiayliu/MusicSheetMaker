@@ -48,23 +48,29 @@ class AudioFileInput:
 
     amplitude_threshold = max_value * 0.5
     indices_over_threshold = (fft_spectrum_abs > amplitude_threshold)
+    # print(type(indices_over_threshold))
     print("Count of values over threshold: ", indices_over_threshold.sum())
     print("Frequencies over threshold: ", freq[indices_over_threshold])
 
-    # taken from a website https://pages.mtu.edu/~suits/notefreqs.html
-    pitches = [["C2", 65.41], ["C#2/Db2", 69.30], ["D2", 73.42], ["D#2/Eb2", 77.78], ["E2", 82.41], ["F2", 87.31],
-               ["F#2/Gb2", 92.5], ["G2", 98], ["G#2/Ab2", 103.83], ["A2", 110], ["A#2/Bb2", 116.54], ["B2", 123.47],
-               ["C3", 130.81], ["C#3/Db3", 138.59], ["D3", 146.83], ["D#3/Eb3", 155.56], ["E3", 164.81], ["F3", 174.61],
-               ["F#3/Gb3", 185], ["G3", 196], ["G#3/Ab3", 207.65], ["A3", 220], ["A#3/Bb3", 233.08], ["B3", 246.94],
-               ["C4", 261.63], ["C#4/Db4", 277.18], ["D4", 293.66], ["D#4/Eb4", 311.13], ["E4", 329.63], ["F4", 349.23],
-               ["F#4/Gb4", 369.99], ["G4", 392], ["G#4/Ab4", 415.3], ["A4", 440], ["A#4/Bb4", 466.16], ["B4", 493.88],
-               ["C5", 523.25], ["C#5/Db5", 554.37], ["D5", 587.33], ["D#5/Eb5", 622.25], ["E5", 659.25], ["F5", 698.46],
-               ["F#5/Gb5", 739.99], ["G5", 783.99], ["G#5/Ab5", 830.61], ["A5", 880], ["A#5/Bb5", 932.33],
-               ["B5", 987.77], ["C6", 1046.60]]
+    num_freq = indices_over_threshold.sum()
+    freq_over_threshold = freq[indices_over_threshold].tolist()
+    freqs = list(map(int, freq_over_threshold))
 
-    freq_diff = pitches - freq[indices_over_threshold]
-    note_freq = ((pitches - freq_diff) < 2)
-    print(pitches[note_freq])
+    # taken from a website https://pages.mtu.edu/~suits/notefreqs.html
+    pitches = {65.41: "C2", 69.3: "C#2/Db2", 73.42: "D2", 77.78: "D#2/Eb2", 82.41: "E2", 87.31: "F2",
+               92.5: "F#2/Gb2", 98: "G2", 103.83: "G#2/Ab2", 110: "A2", 116.54: "A#2/Bb2",
+               123.47: "B2", 130.81: "C3", 138.59: "C#3/Db3", 146.83: "D3", 155.56: "D#3/Eb3",
+               164.81: "E3", 174.61: "F3", 185: "F#3/Gb3", 196: "G3", 207.65: "G#3/Ab3", 220: "A3",
+               233.08: "A#3/Bb3", 246.94: "B3", 261.63: "C4", 277.18: "C#4/Db4", 293.66: "D4",
+               311.13: "D#4/Eb4", 329.63: "E4", 349.23: "F4", 369.99: "F#4/Gb4", 392: "G4",
+               415.3: "G#4/Ab4", 440: "A4", 466.16: "A#4/Bb4", 493.88: "B4", 523.25: "C5",
+               554.37: "C#5/Db5", 587.33: "D5", 622.25: "D#5/Eb5", 659.25: "E5", 698.46: "F5", 739.99: "F#5/Gb5",
+               783.99: "G5", 830.61: "G#5/Ab5", 880: "A5", 932.33: "A#5/Bb5", 987.77: "B5", 1046.6: "C6"}
+
+    for i in freqs:
+        for key in pitches.keys():
+            if (int(key) - freqs[i]) < 1:
+                print(pitches.get(freqs[i]))
 
     # print("Amplitudes over threshold: ", fft_spectrum_abs[indices_over_threshold])
 
