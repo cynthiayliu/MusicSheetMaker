@@ -1,13 +1,8 @@
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.signal
-from numpy import dtype
-from typing import ValuesView
-import heapq
 from scipy.io import wavfile
-from sklearn.cluster import KMeans
 
+HALF_CHROMATIC_STEP = pow(1.0593843639335332, 0.5)
 
 class AudioFileInput:
     plt.rcParams['figure.dpi'] = 100
@@ -20,7 +15,7 @@ class AudioFileInput:
     length_in_s = sound.shape[0] / sampFreq
     print(length_in_s)
     time = np.arange(sound.shape[0]) / sound.shape[0] * length_in_s
-    noteLength = time/3
+    print(time)
 
     # plt.subplot(2, 1, 1)
     # plt.plot(time, sound[:, 0], 'r')
@@ -48,13 +43,12 @@ class AudioFileInput:
 
     amplitude_threshold = max_value * 0.5
     indices_over_threshold = (fft_spectrum_abs > amplitude_threshold)
-    # print(type(indices_over_threshold))
-    print("Count of values over threshold: ", indices_over_threshold.sum())
-    print("Frequencies over threshold: ", freq[indices_over_threshold])
 
     num_freq = indices_over_threshold.sum()
     freq_over_threshold = freq[indices_over_threshold].tolist()
-    freqs = list(map(int, freq_over_threshold))
+
+    print("Count of values over threshold: ", indices_over_threshold.sum())
+    print("Frequencies over threshold: ", freq_over_threshold)
 
     # taken from a website https://pages.mtu.edu/~suits/notefreqs.html
     pitches = {65.41: "C2", 69.3: "C#2/Db2", 73.42: "D2", 77.78: "D#2/Eb2", 82.41: "E2", 87.31: "F2",
@@ -66,11 +60,19 @@ class AudioFileInput:
                415.3: "G#4/Ab4", 440: "A4", 466.16: "A#4/Bb4", 493.88: "B4", 523.25: "C5",
                554.37: "C#5/Db5", 587.33: "D5", 622.25: "D#5/Eb5", 659.25: "E5", 698.46: "F5", 739.99: "F#5/Gb5",
                783.99: "G5", 830.61: "G#5/Ab5", 880: "A5", 932.33: "A#5/Bb5", 987.77: "B5", 1046.6: "C6"}
+    pitch_key_to_freq = {v: k for k, v in pitches.items()}
+    print(pitch_key_to_freq)
 
-    for i in freqs:
-        for key in pitches.keys():
-            if (int(key) - freqs[i]) < 1:
-                print(pitches.get(freqs[i]))
+    pitches_present = set()
+    for detected_freq in freq_over_threshold:
+        for pitch_name in pitch_key_to_freq.keys():
+            pitch_freq = pitch_key_to_freq[pitch_name]
+
+            if pitch_freq / HALF_CHROMATIC_STEP < detected_freq < pitch_freq * HALF_CHROMATIC_STEP:
+                pitches_present.add(pitch_name)
+
+    print("Pitches in this timestep: ", pitches_present)
+
 
     # print("Amplitudes over threshold: ", fft_spectrum_abs[indices_over_threshold])
 
@@ -97,6 +99,9 @@ class AudioFileInput:
     # plt.xlabel("frequency, Hz")
     # plt.ylabel("Amplitude, units")
     # plt.show()
+
+    print(freq)
+    print(fft_spectrum_abs)
 
     plt.plot(freq[:5000], fft_spectrum_abs[:5000])
     plt.xlabel("frequency, Hz")
