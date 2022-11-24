@@ -8,14 +8,13 @@ class AudioFileInput:
     plt.rcParams['figure.dpi'] = 100
     plt.rcParams['figure.figsize'] = (9, 7)
 
-    sampFreq, sound = wavfile.read('Note Tester.wav')
-    print(sound.dtype, sampFreq)
+    samplingRate, sound = wavfile.read('Note Tester.wav')
+    samplingInterval = 1/samplingRate
+    print(sound.dtype, samplingRate, samplingInterval)
     sound = sound / 2.0 ** 15
     print(sound.shape)
-    length_in_s = sound.shape[0] / sampFreq
+    length_in_s = round(sound.shape[0] / float(samplingRate), 2)
     print(length_in_s)
-    time = np.arange(sound.shape[0]) / sound.shape[0] * length_in_s
-    print(time)
 
     # plt.subplot(2, 1, 1)
     # plt.plot(time, sound[:, 0], 'r')
@@ -36,7 +35,7 @@ class AudioFileInput:
 
     signal = sound[:, 0]
     fft_spectrum = np.fft.rfft(signal)
-    freq = np.fft.rfftfreq(signal.size, d=1. / sampFreq)
+    freq = np.fft.rfftfreq(signal.size, d=1. / samplingRate)
     fft_spectrum_abs = np.abs(fft_spectrum)
 
     max_value = np.max(fft_spectrum_abs)
@@ -60,6 +59,8 @@ class AudioFileInput:
                415.3: "G#4/Ab4", 440: "A4", 466.16: "A#4/Bb4", 493.88: "B4", 523.25: "C5",
                554.37: "C#5/Db5", 587.33: "D5", 622.25: "D#5/Eb5", 659.25: "E5", 698.46: "F5", 739.99: "F#5/Gb5",
                783.99: "G5", 830.61: "G#5/Ab5", 880: "A5", 932.33: "A#5/Bb5", 987.77: "B5", 1046.6: "C6"}
+    
+    
     pitch_key_to_freq = {v: k for k, v in pitches.items()}
     print(pitch_key_to_freq)
 
@@ -99,9 +100,6 @@ class AudioFileInput:
     # plt.xlabel("frequency, Hz")
     # plt.ylabel("Amplitude, units")
     # plt.show()
-
-    print(freq)
-    print(fft_spectrum_abs)
 
     plt.plot(freq[:5000], fft_spectrum_abs[:5000])
     plt.xlabel("frequency, Hz")
