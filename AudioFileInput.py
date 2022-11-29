@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io import wavfile
 
-HALF_CHROMATIC_STEP = pow(1.0593843639335332, 0.5)
+HALF_CHROMATIC_STEP = pow(1.0593843639335332, 0.5) # square root of ratio between between neighboring chromatic steps
+# to find the nearest note
 NOTE_SAMPLING_INTERVAL = 0.05  # seconds
 
 
@@ -19,6 +20,9 @@ class AudioFileInput:
         :param filename:
         """
         # TODO extend code to accept more than wav files
+        # use pydub library and ffmpeg to read mp3 and many other file types. Wav files can also be read without using
+        # ffmpeg
+
         plt.rcParams['figure.dpi'] = 100
         plt.rcParams['figure.figsize'] = (9, 7)
 
@@ -61,7 +65,6 @@ class AudioFileInput:
 
             notes = self.resolve_notes_from_sample(left_channel[sample_start:sample_end], sampling_rate, 4)
             print("sample interval: ", sample_start, sample_end, notes)
-
 
     def resolve_notes_from_sample(self, signal, sampling_rate, debug_level):
         """
@@ -146,4 +149,4 @@ class AudioFileInput:
 
 
 if __name__ == "__main__":
-    AudioFileInput().sample_audio_file_into_notes('Note Tester.wav')
+    AudioFileInput().sample_audio_file_into_notes('Tune2Piano.wav')
